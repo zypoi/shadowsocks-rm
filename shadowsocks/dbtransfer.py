@@ -45,13 +45,14 @@ class DbTransfer(object):
         cli.settimeout(2)
         cli.sendto('transfer: {}', ('%s' % (config.MANAGE_BIND_IP), config.MANAGE_PORT))
         bflag = False
-        while True:
+        endflag = True
+        while endflag:
             data, addr = cli.recvfrom(1500)
-            if data == 'e':
-                break
-            data = json.loads(data)
-            # print data
-            dt_transfer.update(data)
+            if data.startswith("stat:"):
+                endflag = False
+                data = json.loads(data.strip("stat: "))
+                # print data
+                dt_transfer.update(data)
         cli.close()
         return dt_transfer
 
